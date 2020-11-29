@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import Login from "../views/Login.vue";
 import List from "../views/List.vue";
+import Detail from "../views/Detail.vue";
 /*
 import Users from "../views/Users.vue";
 import Subjects from "../views/Subjects.vue";
@@ -27,6 +28,11 @@ const routes = [
     path: "/:element",
     name: "List",
     component: List,
+  },
+  {
+    path: "/:element/:code",
+    name: "Detail",
+    component: Detail,
   },
   /*
   {

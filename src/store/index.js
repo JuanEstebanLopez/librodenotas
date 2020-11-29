@@ -57,36 +57,81 @@ const modelInfo = {
       show: false,
     }),
   },
-  Subjects: {
-    name: "Matemáticas",
-    code: "MAT",
-    rubric: "default",
-    students: ["1144", "1155", "1166"],
+  subjects: {
+    name: getModelInfo({ text: "Nombre", value: "name" }),
+    code: getModelInfo({ text: "Código", value: "code" }),
+    rubric: getModelInfo({
+      text: "Rúbrica",
+      value: "rubric",
+      type: "relation",
+      show: false,
+    }),
+    students: getModelInfo({
+      text: "Estudiantes",
+      value: "students",
+      type: "relationMany",
+      show: false,
+    }),
   },
-  Dimensions: {
-    min: 4.7,
-    name: "S",
-    description: "Superior",
+  dimensions: {
+    min: getModelInfo({ text: "Mínimo", value: "min", type: "number" }),
+    name: getModelInfo({ text: "Nombre", value: "name" }),
+    description: getModelInfo({ text: "Descripción", value: "description" }),
   },
-  Termns: {
-    code: "2020-1",
-    startAt: "2020/01/01",
-    endAt: "2020/05/01",
+  terms: {
+    code: getModelInfo({ text: "Código", value: "code" }),
+    startAt: getModelInfo({
+      text: "Fecha inicial",
+      value: "startAt",
+      type: "date",
+    }),
+    endAt: getModelInfo({ text: "Fecha Final", value: "endAt", type: "date" }),
   },
   rubrics: {
-    name: "default",
-    subrubrics: undefined,
+    name: getModelInfo({ text: "Nombre", value: "name" }),
+    subrubrics: getModelInfo({
+      text: "Sub rúbricas",
+      value: "subrubrics",
+      type: "specialRelation",
+      show: false,
+    }),
+    percentages: getModelInfo({
+      text: "Porcentajes",
+      value: "percentages",
+      type: "object",
+      show: false,
+    }),
+    /*
     percentages: {
       P1: { value: 25, name: "Parcial 1", code: "P1" },
       P2: { value: 25, name: "Parcial 2", code: "P2" },
       P3: { value: 25, name: "Parcial 3", code: "P3" },
       P4: { value: 25, name: "Parcial 4", code: "P4" },
     },
+    */
   },
-  Grades: {
-    rubricName: "defaulr",
-    gradeValue: 5,
-    gradedDate: "2020/05/01",
+  grades: {
+    rubricName: getModelInfo({
+      text: "Rúbrica",
+      value: "rubricName",
+      type: "relation",
+      show: false,
+    }),
+    percentageID: getModelInfo({
+      text: "Identificador",
+      value: "percentageID",
+      show: false,
+    }),
+    gradeValue: getModelInfo({
+      text: "Nota",
+      value: "gradeValue",
+      type: "number",
+    }),
+    gradedDate: getModelInfo({
+      text: "Fecha de calificación",
+      value: "gradedDate",
+      type: "date",
+    }),
   },
 };
 
@@ -117,7 +162,7 @@ export default new Vuex.Store({
       {
         title: "Periodos",
         icon: "mdi-timetable",
-        to: { name: "List", params: { element: "termns" } },
+        to: { name: "List", params: { element: "terms" } },
       },
       {
         title: "Calificaciones",
@@ -244,7 +289,7 @@ export default new Vuex.Store({
         description: "Insuficiente",
       },
       N: {
-        min: -1,
+        min: 0,
         name: "N",
         description: "No valorado",
       },
@@ -265,6 +310,10 @@ export default new Vuex.Store({
     routes: (state) => state.routes,
     modelInfo: (state) => state.modelInfo,
     users: (state) => state.users,
+    subjects: (state) => state.subjects,
+    dimensions: (state) => state.dimensions,
+    terms: (state) => state.terms,
+    grades: (state) => state.grades,
   },
   mutations: {},
   actions: {
