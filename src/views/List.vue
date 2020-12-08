@@ -33,7 +33,7 @@
             <router-link
               :to="{
                 name: 'Detail',
-                params: { element: element, code: item.code },
+                params: { element: element, id: item.id },
               }"
             >
               <v-icon>mdi-arrow-right-thick</v-icon>

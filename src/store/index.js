@@ -16,56 +16,77 @@ const defaultModelInfo = {
 function getModelInfo(vars = {}) {
   var rules = []; // [ (email) => !!email || "Email is required", (email) =>  /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email) ||  "Email is not valid"]
   if (vars.required !== false)
-    rules.push((r) => !!r || vars.label + " is required");
-  if (vars.rules) rules = rules.concat(vars.rules);
-  return Object.assign({}, defaultModelInfo, vars, { rules });
+    rules.push((r) => !!r || vars.label + " es requerido");
+  if (vars.rules) vars.rules = rules.concat(vars.rules);
+  return Object.assign({}, defaultModelInfo, vars);
 }
 
 const modelInfo = {
   users: {
-    img: getModelInfo({
+    /*
+    "id": 1,
+	"name": "Proferos 1",
+	"email": "profesor1@gmail.com",
+	"email_verified_at": null,
+	"current_team_id": null,
+	"profile_photo_path": null,
+	"created_at": "2020-12-08T15:12:15.000000Z",
+	"updated_at": "2020-12-08T15:12:15.000000Z",
+	"profile_photo_url": "https:\/\/ui-avatars.com\/api\/?name=Proferos+1&color=7F9CF5&background=EBF4FF"
+*/
+    id: getModelInfo({ text: "ID", value: "id", type: "id", show: false }),
+    profile_photo_url: getModelInfo({
       text: "Foto",
-      value: "img",
+      value: "profile_photo_url",
       type: "img",
       required: false,
       sortable: false,
     }),
-    firstname: getModelInfo({ text: "Nombre", value: "firstname" }),
-    lastname: getModelInfo({ text: "Apellido", value: "lastname" }),
-    code: getModelInfo({ text: "Código", value: "code" }),
-    rol: getModelInfo({
-      text: "Rol",
-      value: "rol",
-      type: "relation",
-      related: "",
+    name: getModelInfo({ text: "Nombre", value: "name" }),
+
+    email: getModelInfo({
+      text: "E-mail",
+      value: "email",
+      rules: [
+        (email) =>
+          /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email) ||
+          "El Email no es válido",
+      ],
     }),
-    state: getModelInfo({
-      text: "Estado Activo",
-      value: "state",
-      type: "boolean",
-    }),
-    subjects: getModelInfo({
-      text: "Materias",
-      value: "subjects",
-      type: "relationMany",
-      related: "",
+    password: getModelInfo({
+      text: "Contraseña",
+      value: "password",
+      type: "password",
       show: false,
     }),
-    educational: getModelInfo({
-      text: "Institución",
-      value: "educational",
-      show: false,
+    created_at: getModelInfo({
+      text: "Usuario desde",
+      value: "created_at",
+      type: "date",
     }),
   },
-  subjects: {
+  courses: {
+    /*
+----- code:"MAT"
+created_at:"2020-12-08T15:12:15.000000Z"
+----- description:"Matemáticas"
+----- id:1
+----- name:"Matemáticas"
+updated_at:"2020-12-08T15:12:15.000000Z"
+----- year_id:1
+*/
+
+    id: getModelInfo({ text: "ID", value: "id", type: "id", show: false }),
     name: getModelInfo({ text: "Nombre", value: "name" }),
     code: getModelInfo({ text: "Código", value: "code" }),
-    rubric: getModelInfo({
+    description: getModelInfo({ text: "Descripción", value: "description" }),
+    year_id: getModelInfo({ text: "ID de año", value: "year_id", show: false }),
+    /*rubric: getModelInfo({
       text: "Rúbrica",
       value: "rubric",
       type: "relation",
       show: false,
-    }),
+    }),*/
     students: getModelInfo({
       text: "Estudiantes",
       value: "students",
@@ -152,7 +173,7 @@ export default new Vuex.Store({
       {
         title: "Materias",
         icon: "mdi-notebook-multiple",
-        to: { name: "List", params: { element: "subjects" } },
+        to: { name: "List", params: { element: "courses" } },
       },
       {
         title: "Dimensiones",
@@ -217,7 +238,7 @@ export default new Vuex.Store({
         lastname: "Jaramillo",
         code: "1100",
         rol: "teacher",
-        subjects: [],
+        courses: [],
         img: "",
         state: true,
         educational: "4411",
@@ -235,7 +256,7 @@ export default new Vuex.Store({
         },
       },
     },
-    subjects: {
+    courses: {
       MAT: {
         name: "Matemáticas",
         code: "MAT",
@@ -310,15 +331,29 @@ export default new Vuex.Store({
     routes: (state) => state.routes,
     modelInfo: (state) => state.modelInfo,
     users: (state) => state.users,
-    subjects: (state) => state.subjects,
+    courses: (state) => state.courses,
     dimensions: (state) => state.dimensions,
     terms: (state) => state.terms,
     grades: (state) => state.grades,
   },
-  mutations: {},
+  mutations: {
+    LOAD: (state, payload) => {
+      state[payload.key] = payload.data;
+      return state[payload.key];
+    },
+  },
   actions: {
     load: function({ commit }, payload) {
-      // commit('LOAD', res.data)
+      axios
+        .get(payload)
+        .then((res) => {
+          return res.data.reduce((allData, actualData) => {
+            allData[actualData.id] = actualData;
+            return allData;
+          }, {});
+        })
+        .then((data) => commit("LOAD", { key: payload, data }))
+        .catch((e) => alert(e));
       console.log(commit, payload);
     },
   },

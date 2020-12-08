@@ -19,9 +19,9 @@ export default {
     elementObject() {
       if (
         this.$store.getters[this.element] &&
-        this.$store.getters[this.element][this.$route.params.code]
+        this.$store.getters[this.element][this.$route.params.id]
       )
-        return this.$store.getters[this.element][this.$route.params.code];
+        return this.$store.getters[this.element][this.$route.params.id];
       return {};
     },
     headers() {
