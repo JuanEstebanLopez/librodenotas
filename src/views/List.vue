@@ -80,13 +80,20 @@ export default {
         }));
     },
   },
+  watch: {
+    element: function(val) {
+      this.updateElement(val);
+    },
+  },
   methods: {
     dateFormat,
-    openElement() {},
+    updateElement(element) {
+      this.$store.dispatch("load", element);
+    },
   },
   created() {
     if (this.$route.params.element) {
-      this.$store.dispatch("load", this.$route.params.element);
+      this.updateElement(this.$route.params.element);
     }
   },
 };

@@ -1,7 +1,10 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
-  </div>
+  <v-container class="detail">
+    <v-row>
+      <img v-if="elementObject.img" src="" alt="" />
+      <h1 v-text="elementObject.name" />
+    </v-row>
+  </v-container>
 </template>
 <script>
 import { dateFormat } from "../helpers/formats";
@@ -16,12 +19,15 @@ export default {
     elementName() {
       return this.$route.params.element;
     },
+    elementID() {
+      return this.$route.params.id;
+    },
     elementObject() {
       if (
-        this.$store.getters[this.element] &&
-        this.$store.getters[this.element][this.$route.params.id]
+        this.$store.getters[this.elementName] &&
+        this.$store.getters[this.elementName][this.elementID]
       )
-        return this.$store.getters[this.element][this.$route.params.id];
+        return this.$store.getters[this.elementName][this.elementID];
       return {};
     },
     headers() {
@@ -35,13 +41,30 @@ export default {
           actions,
         }));
     },
+    modelImage() {
+      var img = Object.values(this.headers).find((h) => h.type === "img");
+      if (img) return img.value;
+      return false;
+    },
+  },
+  watch: {
+    elementName: function(val) {
+      this.updateElement(val, this.elementID);
+    },
   },
   methods: {
     dateFormat,
+    updateElement(element, id) {
+      this.$store.dispatch("load", element + "/" + id);
+    },
   },
   created() {
-    if (this.$route.params.element) {
-      this.$store.dispatch("load", this.$route.params.element);
+    if (this.$route.params.element && this.$route.params.id) {
+      this.$store.dispatch(
+        "load",
+        this.$route.params.element,
+        this.$route.params.id
+      );
     }
   },
 };

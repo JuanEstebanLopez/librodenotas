@@ -66,27 +66,11 @@ const modelInfo = {
     }),
   },
   courses: {
-    /*
------ code:"MAT"
-created_at:"2020-12-08T15:12:15.000000Z"
------ description:"Matemáticas"
------ id:1
------ name:"Matemáticas"
-updated_at:"2020-12-08T15:12:15.000000Z"
------ year_id:1
-*/
-
     id: getModelInfo({ text: "ID", value: "id", type: "id", show: false }),
     name: getModelInfo({ text: "Nombre", value: "name" }),
     code: getModelInfo({ text: "Código", value: "code" }),
     description: getModelInfo({ text: "Descripción", value: "description" }),
     year_id: getModelInfo({ text: "ID de año", value: "year_id", show: false }),
-    /*rubric: getModelInfo({
-      text: "Rúbrica",
-      value: "rubric",
-      type: "relation",
-      show: false,
-    }),*/
     students: getModelInfo({
       text: "Estudiantes",
       value: "students",
@@ -99,14 +83,42 @@ updated_at:"2020-12-08T15:12:15.000000Z"
     name: getModelInfo({ text: "Nombre", value: "name" }),
     description: getModelInfo({ text: "Descripción", value: "description" }),
   },
-  terms: {
-    code: getModelInfo({ text: "Código", value: "code" }),
-    startAt: getModelInfo({
+  periods: {
+    id: getModelInfo({ text: "ID", value: "id", type: "id", show: false }),
+    name: getModelInfo({ text: "Nombre", value: "name" }),
+    year_id: getModelInfo({ text: "ID de año", value: "year_id", show: false }),
+
+    start_at: getModelInfo({
       text: "Fecha inicial",
-      value: "startAt",
+      value: "start_at",
       type: "date",
     }),
-    endAt: getModelInfo({ text: "Fecha Final", value: "endAt", type: "date" }),
+    created_at: getModelInfo({
+      text: "Fecha Final",
+      value: "finish_at",
+      type: "date",
+    }),
+  },
+  years: {
+    id: getModelInfo({ text: "ID", value: "id", type: "id", show: false }),
+    name: getModelInfo({ text: "Nombre", value: "name" }),
+    start_at: getModelInfo({
+      text: "Fecha inicial",
+      value: "start_at",
+      type: "date",
+    }),
+    created_at: getModelInfo({
+      text: "Fecha Final",
+      value: "finish_at",
+      type: "date",
+    }),
+    periods: getModelInfo({
+      text: "Periodos",
+      value: "periods",
+      to: "periods",
+      type: "relationMany",
+      show: false,
+    }),
   },
   rubrics: {
     name: getModelInfo({ text: "Nombre", value: "name" }),
@@ -122,14 +134,6 @@ updated_at:"2020-12-08T15:12:15.000000Z"
       type: "object",
       show: false,
     }),
-    /*
-    percentages: {
-      P1: { value: 25, name: "Parcial 1", code: "P1" },
-      P2: { value: 25, name: "Parcial 2", code: "P2" },
-      P3: { value: 25, name: "Parcial 3", code: "P3" },
-      P4: { value: 25, name: "Parcial 4", code: "P4" },
-    },
-    */
   },
   grades: {
     rubricName: getModelInfo({
@@ -161,11 +165,6 @@ export default new Vuex.Store({
     modelInfo: modelInfo,
     routes: [
       {
-        title: "Inicio",
-        icon: "mdi-home",
-        to: { name: "Home" },
-      },
-      {
         title: "Usuarios",
         icon: "mdi-account-group",
         to: { name: "List", params: { element: "users" } },
@@ -183,7 +182,12 @@ export default new Vuex.Store({
       {
         title: "Periodos",
         icon: "mdi-timetable",
-        to: { name: "List", params: { element: "terms" } },
+        to: { name: "List", params: { element: "periods" } },
+      },
+      {
+        title: "Años lectivos",
+        icon: "mdi-calendar",
+        to: { name: "List", params: { element: "years" } },
       },
       {
         title: "Calificaciones",
@@ -192,102 +196,10 @@ export default new Vuex.Store({
       },
     ],
     authUser: undefined,
-    educationalAccount: {
-      name: "Icesi",
-      code: "4411",
-      user: "1100",
-      logo: "",
-      address: "",
-      phone: "",
-      email: "icesi@correo.com",
-      maxGrade: 5,
-    },
-    users: {
-      "1144": {
-        firstname: "Camilo",
-        lastname: "Lopez",
-        code: "1144",
-        rol: "student",
-        courses: [],
-        img: "",
-        state: true,
-        educational: "4411",
-      },
-      "1155": {
-        firstname: "Carlos",
-        lastname: "Hernandez",
-        code: "1155",
-        rol: "student",
-        courses: [],
-        img: "",
-        state: true,
-        educational: "4411",
-      },
-      "1166": {
-        firstname: "José",
-        lastname: "Restrepo",
-        code: "1166",
-        rol: "student",
-        courses: [],
-        img: "",
-        state: true,
-        educational: "4411",
-      },
-      "1100": {
-        firstname: "David",
-        lastname: "Jaramillo",
-        code: "1100",
-        rol: "teacher",
-        courses: [],
-        img: "",
-        state: true,
-        educational: "4411",
-      },
-    },
-    rubric: {
-      default: {
-        name: "default",
-        subrubrics: undefined,
-        percentages: {
-          P1: { value: 25, name: "Parcial 1", code: "P1" },
-          P2: { value: 25, name: "Parcial 2", code: "P2" },
-          P3: { value: 25, name: "Parcial 3", code: "P3" },
-          P4: { value: 25, name: "Parcial 4", code: "P4" },
-        },
-      },
-    },
-    courses: {
-      MAT: {
-        name: "Matemáticas",
-        code: "MAT",
-        rubric: "default",
-        students: ["1144", "1155", "1166"],
-      },
-      ESP: {
-        name: "Español",
-        code: "ESP",
-        rubric: "default",
-        students: ["1144", "1155", "1166"],
-      },
-      ENG: {
-        name: "Inglés",
-        code: "ENG",
-        rubric: "default",
-        students: ["1144", "1155", "1166"],
-      },
-    },
-    terms: {
-      "2020-1": {
-        code: "2020-1",
-        startAt: "2020/01/01",
-        endAt: "2020/05/01",
-      },
-      "2020-2": {
-        code: "2020-2",
-        startAt: "2020/06/01",
-        endAt: "2020/11/01",
-      },
-    },
+    users: [],
+    courses: [],
+    periods: [],
+    years: [],
     dimensions: {
       S: {
         min: 4.7,
@@ -333,7 +245,8 @@ export default new Vuex.Store({
     users: (state) => state.users,
     courses: (state) => state.courses,
     dimensions: (state) => state.dimensions,
-    terms: (state) => state.terms,
+    periods: (state) => state.periods,
+    years: (state) => state.years,
     grades: (state) => state.grades,
   },
   mutations: {
@@ -347,10 +260,14 @@ export default new Vuex.Store({
       axios
         .get(payload)
         .then((res) => {
-          return res.data.reduce((allData, actualData) => {
-            allData[actualData.id] = actualData;
-            return allData;
-          }, {});
+          if (Array.isArray(res.data))
+            return res.data.reduce((allData, actualData) => {
+              allData[actualData.id] = actualData;
+              return allData;
+            }, {});
+          var dt = {};
+          dt[res.data.id] = res.data;
+          return dt;
         })
         .then((data) => commit("LOAD", { key: payload, data }))
         .catch((e) => alert(e));
