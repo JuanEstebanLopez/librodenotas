@@ -78,6 +78,14 @@
                     </v-btn>
                   </v-date-picker>
                 </v-menu>
+                <v-select
+                  v-else-if="h.type == 'relation'"
+                  :items="getRelatedList(h.to)"
+                  item-value="id"
+                  item-text="name"
+                  v-model="formData[h.value]"
+                >
+                </v-select>
                 <v-text-field
                   v-else
                   :label="h.text"
@@ -127,8 +135,7 @@ export default {
       formData: {},
       comparableDateMenu: {},
       comparableDateString: {},
-      dates: ["2018-09-15", "2018-09-20"],
-      menu: false,
+      updateList: false,
     };
   },
   computed: {
@@ -151,13 +158,14 @@ export default {
     },
     headers() {
       return Object.values(this.$store.getters["modelInfo"][this.elementName])
-        .filter((h) => h.type !=="id")
-        .map(({ type, text, value, sortable, actions }) => ({
+        .filter((h) => !["id", "relationVal"].includes(h.type) )
+        .map(({ type, text, value, sortable, actions, to }) => ({
           type,
           text,
           value,
           sortable,
           actions,
+          to,
         }));
     },
   },
@@ -171,8 +179,18 @@ export default {
   },
   methods: {
     dateFormat,
-    updateElement(element, id) {
-      this.$store.dispatch("load", element + "/" + id);
+    updateElement(element, id = undefined) {
+      var route = id ? element + "/" + id : element;
+      this.$store.dispatch("load", route);
+    },
+    getRelatedList(to) {
+      var list = Object.values(this.$store.getters[to]);
+      if (list.length > 0) return list;
+      else if (!this.updateList) {
+        this.updateElement(to);
+        this.updateList = true;
+      }
+      return [];
     },
     updateFormData(val) {
       this.formData = Object.assign(this.formData, val);

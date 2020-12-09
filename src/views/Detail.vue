@@ -57,6 +57,9 @@
                 <span v-else-if="h.type == 'date'">
                   {{ dateFormat(elementObject[h.value]) }}
                 </span>
+                <span v-else-if="h.type == 'relation'">
+                  {{ getRelated(elementObject, h.value, h.to).name }}
+                </span>
                 <span v-else v-text="elementObject[h.value]" />
               </v-col>
             </v-row>
@@ -114,12 +117,13 @@ export default {
     headers() {
       return Object.values(this.$store.getters["modelInfo"][this.elementName])
         .filter((h) => h.show)
-        .map(({ type, text, value, sortable, actions }) => ({
+        .map(({ type, text, value, sortable, actions, to }) => ({
           type,
           text,
           value,
           sortable,
           actions,
+          to,
         }));
     },
     modelImage() {
@@ -135,8 +139,18 @@ export default {
   },
   methods: {
     dateFormat,
-    updateElement(element, id) {
-      this.$store.dispatch("load", element + "/" + id);
+    updateElement(element, id = undefined) {
+      var route = id ? element + "/" + id : element;
+      this.$store.dispatch("load", route);
+    },
+    getRelated(element, key, to) {
+      var k = key.includes("_") ? key.split("_")[0] : key;
+      if (element[k]) return element[k];
+      var related = this.$store.getters[to][element[key]];
+      if (related) return related;
+      else if (Object.keys(this.$store.getters[to]) == 0)
+        this.updateElement(to);
+      return {};
     },
     deleteConfirm() {
       this.deleteDialog = true;

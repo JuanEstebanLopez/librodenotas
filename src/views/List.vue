@@ -44,6 +44,9 @@
             <span v-else-if="h.type == 'date'">
               {{ dateFormat(item[h.value]) }}
             </span>
+            <span v-else-if="h.type == 'relation'">
+              {{ getRelated(item, h.value, h.to).name }}
+            </span>
             <span v-else v-text="item[h.value]" />
           </td>
           <td v-if="element !== 'dimensions'">
@@ -88,12 +91,13 @@ export default {
     headers() {
       return Object.values(this.$store.getters["modelInfo"][this.element])
         .filter((h) => h.show)
-        .map(({ type, text, value, sortable, actions }) => ({
+        .map(({ type, text, value, sortable, actions, to }) => ({
           type,
           text,
           value,
           sortable,
           actions,
+          to,
         }));
     },
   },
@@ -106,6 +110,15 @@ export default {
     dateFormat,
     updateElement(element) {
       if (element !== "dimensions") this.$store.dispatch("load", element);
+    },
+    getRelated(element, key, to) {
+      var k = key.includes("_") ? key.split("_")[0] : key;
+      if (element[k]) return element[k];
+      var related = this.$store.getters[to][element[key]];
+      if (related) return related;
+      else if (Object.keys(this.$store.getters[to]) == 0)
+        this.updateElement(to);
+      return {};
     },
   },
   created() {

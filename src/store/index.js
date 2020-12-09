@@ -59,12 +59,11 @@ const modelInfo = {
     name: getModelInfo({ text: "Nombre", value: "name" }),
     code: getModelInfo({ text: "Código", value: "code" }),
     description: getModelInfo({ text: "Descripción", value: "description" }),
-    year_id: getModelInfo({ text: "ID de año", value: "year_id", show: false }),
-    students: getModelInfo({
-      text: "Estudiantes",
-      value: "students",
-      type: "relationMany",
-      show: false,
+    year_id: getModelInfo({
+      text: "Año",
+      value: "year_id",
+      type: "relation",
+      to: "years",
     }),
   },
   dimensions: {
@@ -75,7 +74,12 @@ const modelInfo = {
   periods: {
     id: getModelInfo({ text: "ID", value: "id", type: "id", show: false }),
     name: getModelInfo({ text: "Nombre", value: "name" }),
-    year_id: getModelInfo({ text: "ID de año", value: "year_id", show: false }),
+    year_id: getModelInfo({
+      text: "Año",
+      value: "year_id",
+      type: "relation",
+      to: "years",
+    }),
 
     start_at: getModelInfo({
       text: "Fecha inicial",
@@ -125,28 +129,53 @@ const modelInfo = {
     }),
   },
   grades: {
-    rubricName: getModelInfo({
-      text: "Rúbrica",
-      value: "rubricName",
+    id: getModelInfo({ text: "ID", value: "id", type: "id", show: false }),
+    user_id: getModelInfo({
+      text: "Usuario",
+      value: "user_id",
       type: "relation",
-      show: false,
+      to: "users",
     }),
-    percentageID: getModelInfo({
-      text: "Identificador",
-      value: "percentageID",
-      show: false,
+    course_id: getModelInfo({
+      text: "Curso",
+      value: "course_id",
+      type: "relation",
+      to: "courses",
     }),
-    gradeValue: getModelInfo({
+    period_id: getModelInfo({
+      text: "Periodo",
+      value: "period_id",
+      type: "relation",
+      to: "periods",
+    }),
+    grade: getModelInfo({
       text: "Nota",
-      value: "gradeValue",
+      value: "grade",
       type: "number",
     }),
-    gradedDate: getModelInfo({
-      text: "Fecha de calificación",
-      value: "gradedDate",
-      type: "date",
+    user: getModelInfo({
+      text: "Usuario",
+      value: "user",
+      type: "relationVal",
+      to: "users",
+      show:false
+    }),
+    course: getModelInfo({
+      text: "Curso",
+      value: "course",
+      type: "relationVal",
+      to: "courses",
+      show:false
+    }),
+    period: getModelInfo({
+      text: "Periodo",
+      value: "period",
+      type: "relationVal",
+      to: "periods",
+      show:false
     }),
   },
+  
 };
 
 export default new Vuex.Store({
@@ -185,10 +214,10 @@ export default new Vuex.Store({
       },
     ],
     authUser: undefined,
-    users: [],
-    courses: [],
-    periods: [],
-    years: [],
+    users: {},
+    courses: {},
+    periods: {},
+    years: {},
     dimensions: {
       S: {
         min: 4.7,
@@ -246,7 +275,7 @@ export default new Vuex.Store({
   },
   actions: {
     load: function({ commit }, payload) {
-      var key = payload.includes("/")? payload.split("/")[0]: payload;
+      var key = payload.includes("/") ? payload.split("/")[0] : payload;
       axios
         .get(payload)
         .then((res) => {
