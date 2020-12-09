@@ -8,7 +8,7 @@
       <v-col>
         <v-data-table
           :headers="headers"
-          :items="grades"
+          :items="gradesList"
           hide-default-header
           hide-default-footer
           class="elevation-3"
@@ -43,13 +43,32 @@
                 class="py-5 gradeForm"
               >
                 <v-text-field
-                  v-if="item.edit"
+                  v-if="grades[item.course_id][h.id].edit"
+                  v-model="grades[item.course_id][h.id].value"
+                  @change="grades[item.course_id][h.id].status ='modified'"
                   type="number"
                   label="Nota"
                 ></v-text-field>
                 <span v-else v-text="item[h.id].value"></span>
                 <div class="actions">
-                  <v-btn class="mr-5" x-small elevation="1" fab color="primary"
+                  <v-btn
+                    v-if="grades[item.course_id][h.id].edit"
+                    class="mr-5"
+                    x-small
+                    elevation="1"
+                    fab
+                    color="success"
+                    @click="grades[item.course_id][h.id].edit = false"
+                    ><v-icon>mdi-check</v-icon></v-btn
+                  >
+                  <v-btn
+                    v-else
+                    class="mr-5"
+                    x-small
+                    elevation="1"
+                    fab
+                    color="primary"
+                    @click="openEditGrade(item.course_id, h.id)"
                     ><v-icon>mdi-pencil</v-icon></v-btn
                   >
                 </div>
@@ -73,7 +92,7 @@ export default {
       comparableDateMenu: {},
       comparableDateString: {},
       updateList: false,
-      grades: [],
+      grades: {},
     };
   },
   computed: {
@@ -85,10 +104,10 @@ export default {
     },
     studentObject() {
       if (
-        this.$store.getters["students"] &&
-        this.$store.getters["students"][this.userID]
+        this.$store.getters["users"] &&
+        this.$store.getters["users"][this.userID]
       )
-        return this.$store.getters["students"][this.userID];
+        return this.$store.getters["users"][this.userID];
       return {};
     },
     periods() {
@@ -106,6 +125,9 @@ export default {
       return Object.values(this.periods).map((h) =>
         Object.assign({ text: h.name }, h)
       );
+    },
+    gradesList() {
+      return Object.values(this.grades);
     },
     gradesCourses() {
       var list = Object.values(this.$store.getters["grades"]).filter(
@@ -142,15 +164,22 @@ export default {
       }
       return [];
     },
+    openEditGrade(course_id, period_id) {
+      // console.log(course_id, period_id);
+      var course = this.grades[course_id]; //this.grades.find((g) => g.course_id == course_id);
+      if (course) this.$set(course[period_id], "edit", true);
+      // console.log(course, course.edit);
+    },
     updategradesForm(grades) {
-      var oldGrades = this.grades.reduce((grs, o) => {
+      var oldGrades = this.grades;
+      /*this.grades.reduce((grs, o) => {
         grs[o.course_id] = o;
         return grs;
-      }, {});
+      }, {});*/
       var periods = Object.values(this.periods).sort((a, b) =>
         a.start_at.localeCompare(b.start_at)
       );
-      var newGrades = [];
+      var newGrades = {};
 
       console.log(oldGrades, periods);
       this.courses.forEach((c) => {
@@ -181,18 +210,20 @@ export default {
             }
           }
         });
-        newGrades.push(newG);
+        newGrades[c.id] = newG;
       });
 
       this.grades = newGrades;
     },
     finalGrade(course_id) {
-      var grades = this.grades.find((g) => g.course_id == course_id);
+      var grades = this.grades[course_id] // .find((g) => g.course_id == course_id);
       if (!grades) return "N/A";
-      var list = Object.values(grades).filter((g) => g.status != "none");
+      var list = Object.values(grades).filter(
+        (g) => g.status && g.status != "none"
+      );
       if (list.length == 0) return "N/A";
 
-      // console.log(list, course_id)
+      console.log(list, course_id);
 
       return (
         list.reduce((total, period) => total + period.value, 0) / list.length
@@ -254,7 +285,7 @@ export default {
   position: relative;
 }
 .gradeForm:hover .actions {
-    display: initial;
+  display: initial;
 }
 .gradeForm .actions {
   display: none;
