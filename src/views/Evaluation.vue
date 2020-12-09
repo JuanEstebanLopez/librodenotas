@@ -226,7 +226,7 @@ export default {
       console.log(list, course_id);
 
       return (
-        list.reduce((total, period) => total + period.value, 0) / list.length
+        list.reduce((total, period) => total + parseInt(period.value), 0) / list.length
       );
     },
     updateFormData(val) {
