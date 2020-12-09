@@ -243,13 +243,10 @@ export default new Vuex.Store({
       state[payload.key] = payload.data;
       return state[payload.key];
     },
-    DELETE: (state, { element, id }) => {
-      delete state[element][id];
-      return true;
-    },
   },
   actions: {
     load: function({ commit }, payload) {
+      var key = payload.includes("/")? payload.split("/")[0]: payload;
       axios
         .get(payload)
         .then((res) => {
@@ -262,15 +259,26 @@ export default new Vuex.Store({
           dt[res.data.id] = res.data;
           return dt;
         })
-        .then((data) => commit("LOAD", { key: payload, data }))
+        .then((data) => commit("LOAD", { key, data }))
         .catch((e) => alert(e));
-      console.log(commit, payload);
     },
-    delete: function({ commit }, { element, id }) {
+    delete: function({ dispatch }, { element, id }) {
       axios
         .delete(element + "/" + id)
-        .then(() => commit("DELETE", { element, id }))
+        .then(() => dispatch("load", element))
         .catch(() => alert("error al eliminar el " + element + " " + id));
+    },
+    create: function({ dispatch }, { route, data }) {
+      axios
+        .post(route, data)
+        .then(() => dispatch("load", route))
+        .catch(() => alert("error al crear un nuevo elemento"));
+    },
+    update: function({ dispatch }, { route, data }) {
+      axios
+        .put(route, data)
+        .then(() => dispatch("load", route))
+        .catch(() => alert("error al actualizar el elemento"));
     },
   },
   modules: {},

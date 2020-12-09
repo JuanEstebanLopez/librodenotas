@@ -24,7 +24,13 @@
         }"
         ><v-icon>mdi-pencil</v-icon></v-btn
       >
-      <v-btn class="mr-3" small elevation="2" fab color="error"
+      <v-btn
+        class="mr-3"
+        small
+        elevation="2"
+        fab
+        color="error"
+        @click="deleteConfirm"
         ><v-icon>mdi-trash-can-outline</v-icon></v-btn
       >
     </v-row>
@@ -58,6 +64,25 @@
         </v-sheet>
       </v-col>
     </v-row>
+    <v-dialog v-model="deleteDialog" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline red--text text--darken-2">
+          Eliminar {{ elementName }}
+        </v-card-title>
+        <v-card-text
+          >¿Seguro que quiere eliminar a {{ elementObject.name }}?</v-card-text
+        >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="grey" text @click="deleteDialog = false">
+            cancelar
+          </v-btn>
+          <v-btn color="red darken-1" text @click="deleteElement">
+            eliminar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 <script>
@@ -65,7 +90,9 @@ import { dateFormat } from "../helpers/formats";
 const defaultUserImage = require("../assets/defaultuser.png");
 export default {
   name: "Detail",
-
+  data() {
+    return { deleteDialog: false };
+  },
   computed: {
     defaultUserImage() {
       return defaultUserImage;
@@ -111,27 +138,28 @@ export default {
     updateElement(element, id) {
       this.$store.dispatch("load", element + "/" + id);
     },
-    eliminar() {
-      if (confirm("Seguro que quiere eliminar al " + this.elementObject.name))
-        this.$store
-          .dispatch("delete", {
-            element: this.elementName,
-            id: this.elementID,
+    deleteConfirm() {
+      this.deleteDialog = true;
+    },
+    deleteElement() {
+      this.$store
+        .dispatch("delete", {
+          element: this.elementName,
+          id: this.elementID,
+        })
+        .then(() =>
+          this.$router.push({
+            name: "List",
+            params: { element: this.elementName },
           })
-          .then(() =>
-            this.$router.push({
-              name: "List",
-              params: { element: this.elementName },
-            })
-          );
+        );
     },
   },
   created() {
     if (this.$route.params.element && this.$route.params.id) {
       this.$store.dispatch(
         "load",
-        this.$route.params.element,
-        this.$route.params.id
+        this.$route.params.element + "/" + this.$route.params.id
       );
     }
   },
