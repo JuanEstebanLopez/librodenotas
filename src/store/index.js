@@ -158,24 +158,23 @@ const modelInfo = {
       value: "user",
       type: "relationVal",
       to: "users",
-      show:false
+      show: false,
     }),
     course: getModelInfo({
       text: "Curso",
       value: "course",
       type: "relationVal",
       to: "courses",
-      show:false
+      show: false,
     }),
     period: getModelInfo({
       text: "Periodo",
       value: "period",
       type: "relationVal",
       to: "periods",
-      show:false
+      show: false,
     }),
   },
-  
 };
 
 export default new Vuex.Store({
@@ -218,6 +217,8 @@ export default new Vuex.Store({
     courses: {},
     periods: {},
     years: {},
+    teachers: {},
+    students: {},
     dimensions: {
       S: {
         min: 4.7,
@@ -266,6 +267,8 @@ export default new Vuex.Store({
     periods: (state) => state.periods,
     years: (state) => state.years,
     grades: (state) => state.grades,
+    teachers: (state) => state.teachers,
+    students: (state) => state.students,
   },
   mutations: {
     LOAD: (state, payload) => {

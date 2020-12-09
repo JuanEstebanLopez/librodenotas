@@ -10,6 +10,21 @@
       <h1 v-text="elementObject.name" />
       <v-spacer></v-spacer>
       <v-btn
+        v-if="isStudent(elementID)"
+        class="mr-5"
+        small
+        elevation="2"
+        fab
+        color="success"
+        :to="{
+          name: 'Evaluation',
+          params: {
+            id: elementID,
+          },
+        }"
+        ><v-icon>mdi-format-list-checks</v-icon></v-btn
+      >
+      <v-btn
         class="mr-3"
         small
         elevation="2"
@@ -131,6 +146,13 @@ export default {
       if (img) return img.value;
       return false;
     },
+    students() {
+      if (this.elementName != "users") return [];
+      var list = Object.values(this.$store.getters["students"]).map(
+        (s) => s.user_id
+      );
+      return Array.from(new Set(list));
+    },
   },
   watch: {
     elementName: function(val) {
@@ -142,6 +164,11 @@ export default {
     updateElement(element, id = undefined) {
       var route = id ? element + "/" + id : element;
       this.$store.dispatch("load", route);
+    },
+    isStudent(user_id) {
+      return (
+        this.elementName == "users" && this.students.includes(parseInt(user_id))
+      );
     },
     getRelated(element, key, to) {
       var k = key.includes("_") ? key.split("_")[0] : key;
@@ -175,6 +202,8 @@ export default {
         "load",
         this.$route.params.element + "/" + this.$route.params.id
       );
+      if (this.$route.params.element == "users")
+        this.$store.dispatch("load", "students");
     }
   },
 };

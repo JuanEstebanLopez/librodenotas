@@ -4,6 +4,7 @@
       <h1>Lista de: {{ element }}</h1>
       <v-spacer></v-spacer>
       <v-btn
+        v-if="element !== 'dimensions'"
         class="mr-3"
         small
         elevation="2"

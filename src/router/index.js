@@ -5,6 +5,7 @@ import Login from "../views/Login.vue";
 import List from "../views/List.vue";
 import Detail from "../views/Detail.vue";
 import Form from "../views/Form.vue";
+import Evaluation from "../views/Evaluation.vue";
 
 Vue.use(VueRouter);
 
@@ -23,6 +24,11 @@ const routes = [
     path: "/create/:element",
     name: "Create",
     component: Form,
+  },
+  {
+    path: "/evaluation/:id",
+    name: "Evaluation",
+    component: Evaluation,
   },
   {
     path: "/edit/:element/:id",
