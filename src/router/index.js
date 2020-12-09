@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 import Login from "../views/Login.vue";
 import List from "../views/List.vue";
 import Detail from "../views/Detail.vue";
+import Form from "../views/Form.vue";
 
 Vue.use(VueRouter);
 
@@ -19,6 +20,16 @@ const routes = [
     component: Login,
   },
   {
+    path: "/create/:element",
+    name: "Create",
+    component: Form,
+  },
+  {
+    path: "/edit/:element/:id",
+    name: "Edit",
+    component: Form,
+  },
+  {
     path: "/:element",
     name: "List",
     component: List,
@@ -28,6 +39,7 @@ const routes = [
     name: "Detail",
     component: Detail,
   },
+  
   
 ];
 

@@ -1,32 +1,7 @@
 <template>
   <v-container class="detail">
     <v-row class="px-3">
-      <v-avatar v-if="modelImage" size="56" class="mr-4">
-        <img
-          :src="elementObject[modelImage]"
-          :alt="elementObject.name + ' image'"
-        />
-      </v-avatar>
       <h1 v-text="elementObject.name" />
-      <v-spacer></v-spacer>
-      <v-btn
-        class="mr-3"
-        small
-        elevation="2"
-        fab
-        color="primary"
-        :to="{
-          name: 'Edit',
-          params: {
-            element: elementName,
-            id: elementID,
-          },
-        }"
-        ><v-icon>mdi-pencil</v-icon></v-btn
-      >
-      <v-btn class="mr-3" small elevation="2" fab color="error"
-        ><v-icon>mdi-trash-can-outline</v-icon></v-btn
-      >
     </v-row>
     <v-row>
       <v-col>
@@ -37,21 +12,28 @@
                 <b v-text="h.text" />
               </v-col>
               <v-col md-8>
-                <v-avatar
-                  v-if="h.type == 'img'"
-                  width="2.5em"
-                  height="2.5em"
-                  class="ma-2"
-                >
-                  <img
-                    :src="elementObject[h.value] || defaultUserImage"
-                    :alt="h.text"
+                <div v-if="h.type == 'img'">
+                  <v-avatar
+                    v-if="formData[h.value]"
+                    width="2.5em"
+                    height="2.5em"
+                    class="ma-2"
+                  >
+                    <img :src="formData[h.value]" :alt="h.text" />
+                  </v-avatar>
+
+                  <v-text-field
+                    type="text"
+                    v-model="formData[h.value]"
+                    label="Url de la imagen"
+                    rules:h.rules
                   />
-                </v-avatar>
+                </div>
                 <span v-else-if="h.type == 'date'">
                   {{ dateFormat(elementObject[h.value]) }}
                 </span>
-                <span v-else v-text="elementObject[h.value]" />
+                <v-text-field v-else :label="h.text" :required="h.required" v-model="formData[h.value]" rules:h.rules></v-text-field>
+                
               </v-col>
             </v-row>
           </v-container>
@@ -65,7 +47,11 @@ import { dateFormat } from "../helpers/formats";
 const defaultUserImage = require("../assets/defaultuser.png");
 export default {
   name: "Detail",
-
+  data() {
+    return {
+      formData: {},
+    };
+  },
   computed: {
     defaultUserImage() {
       return defaultUserImage;
@@ -95,15 +81,13 @@ export default {
           actions,
         }));
     },
-    modelImage() {
-      var img = Object.values(this.headers).find((h) => h.type === "img");
-      if (img) return img.value;
-      return false;
-    },
   },
   watch: {
     elementName: function(val) {
       this.updateElement(val, this.elementID);
+    },
+    elementObject: function(val) {
+      this.formData = Object.assign(this.formData, val);
     },
   },
   methods: {
@@ -111,19 +95,31 @@ export default {
     updateElement(element, id) {
       this.$store.dispatch("load", element + "/" + id);
     },
-    eliminar() {
-      if (confirm("Seguro que quiere eliminar al " + this.elementObject.name))
-        this.$store
-          .dispatch("delete", {
-            element: this.elementName,
-            id: this.elementID,
+    create() {
+      this.$store
+        .dispatch("create", {
+          route: this.elementName,
+          data: this.formData,
+        })
+        .then(() =>
+          this.$router.push({
+            name: "List",
+            params: { element: this.elementName },
           })
-          .then(() =>
-            this.$router.push({
-              name: "List",
-              params: { element: this.elementName },
-            })
-          );
+        );
+    },
+    update() {
+      this.$store
+        .dispatch("update", {
+          route: this.elementName + "/" + this.elementID,
+          data: this.formData,
+        })
+        .then(() =>
+          this.$router.push({
+            name: "Detail",
+            params: { element: this.elementName, id: this.elementID },
+          })
+        );
     },
   },
   created() {

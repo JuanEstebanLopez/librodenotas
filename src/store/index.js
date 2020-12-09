@@ -23,17 +23,6 @@ function getModelInfo(vars = {}) {
 
 const modelInfo = {
   users: {
-    /*
-    "id": 1,
-	"name": "Proferos 1",
-	"email": "profesor1@gmail.com",
-	"email_verified_at": null,
-	"current_team_id": null,
-	"profile_photo_path": null,
-	"created_at": "2020-12-08T15:12:15.000000Z",
-	"updated_at": "2020-12-08T15:12:15.000000Z",
-	"profile_photo_url": "https:\/\/ui-avatars.com\/api\/?name=Proferos+1&color=7F9CF5&background=EBF4FF"
-*/
     id: getModelInfo({ text: "ID", value: "id", type: "id", show: false }),
     profile_photo_url: getModelInfo({
       text: "Foto",
@@ -79,9 +68,9 @@ const modelInfo = {
     }),
   },
   dimensions: {
-    min: getModelInfo({ text: "Mínimo", value: "min", type: "number" }),
     name: getModelInfo({ text: "Nombre", value: "name" }),
     description: getModelInfo({ text: "Descripción", value: "description" }),
+    min: getModelInfo({ text: "Mínimo", value: "min", type: "number" }),
   },
   periods: {
     id: getModelInfo({ text: "ID", value: "id", type: "id", show: false }),
@@ -254,6 +243,10 @@ export default new Vuex.Store({
       state[payload.key] = payload.data;
       return state[payload.key];
     },
+    DELETE: (state, { element, id }) => {
+      delete state[element][id];
+      return true;
+    },
   },
   actions: {
     load: function({ commit }, payload) {
@@ -272,6 +265,12 @@ export default new Vuex.Store({
         .then((data) => commit("LOAD", { key: payload, data }))
         .catch((e) => alert(e));
       console.log(commit, payload);
+    },
+    delete: function({ commit }, { element, id }) {
+      axios
+        .delete(element + "/" + id)
+        .then(() => commit("DELETE", { element, id }))
+        .catch(() => alert("error al eliminar el " + element + " " + id));
     },
   },
   modules: {},

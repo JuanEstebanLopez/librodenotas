@@ -1,6 +1,24 @@
 <template>
   <div class="section">
-    <h1>Lista de: {{ element }}</h1>
+    <v-row class="px-3">
+      <h1>Lista de: {{ element }}</h1>
+      <v-spacer></v-spacer>
+      <v-btn
+        class="mr-3"
+        small
+        elevation="2"
+        fab
+        color="primary"
+        :to="{
+          name: 'Create',
+          params: {
+            element: element,
+          },
+        }"
+        ><v-icon>mdi-plus</v-icon></v-btn
+      >
+    </v-row>
+
     <v-data-table
       :headers="headers"
       :items="list"
@@ -11,7 +29,6 @@
         itemsPerPageOptions: [5, 10, 30, 100, -1],
         disableItemsPerPage: false,
       }"
-      @click:row="openElement"
     >
       <template v-slot:item="{ item }">
         <tr>
@@ -29,7 +46,7 @@
             </span>
             <span v-else v-text="item[h.value]" />
           </td>
-          <td>
+          <td v-if="element !== 'dimensions'">
             <router-link
               :to="{
                 name: 'Detail',
@@ -88,7 +105,7 @@ export default {
   methods: {
     dateFormat,
     updateElement(element) {
-      this.$store.dispatch("load", element);
+      if (element !== "dimensions") this.$store.dispatch("load", element);
     },
   },
   created() {
