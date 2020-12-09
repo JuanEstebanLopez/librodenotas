@@ -1,7 +1,7 @@
 <template>
   <v-container class="detail">
     <v-row class="px-3">
-      <h1 v-if="elementID" v-text="'Actualizar ' + elementObject.name" />
+      <h1 v-if="elementID" v-text="'Actualizar ' + (elementObject.name || elementName )" />
       <h1 v-else>Crear {{ elementName }}</h1>
     </v-row>
     <v-row>
