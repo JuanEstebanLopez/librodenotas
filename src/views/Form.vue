@@ -129,7 +129,7 @@
 import { dateFormat } from "../helpers/formats";
 const defaultUserImage = require("../assets/defaultuser.png");
 export default {
-  name: "Detail",
+  name: "Form",
   data() {
     return {
       formData: {},

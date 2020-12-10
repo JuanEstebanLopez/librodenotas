@@ -14,7 +14,7 @@
           class="elevation-3"
         >
           <template v-slot:header="{ props }">
-            <tr class="text-center">
+            <tr class="text-center border">
               <th>
                 <b>
                   Materia
@@ -45,7 +45,7 @@
                 <v-text-field
                   v-if="grades[item.course_id][h.id].edit"
                   v-model="grades[item.course_id][h.id].value"
-                  @change="grades[item.course_id][h.id].status ='modified'"
+                  @change="grades[item.course_id][h.id].status = 'modified'"
                   type="number"
                   label="Nota"
                 ></v-text-field>
@@ -58,7 +58,7 @@
                     elevation="1"
                     fab
                     color="success"
-                    @click="grades[item.course_id][h.id].edit = false"
+                    @click="saveGrade(item.course_id, h.id)"
                     ><v-icon>mdi-check</v-icon></v-btn
                   >
                   <v-btn
@@ -170,6 +170,36 @@ export default {
       if (course) this.$set(course[period_id], "edit", true);
       // console.log(course, course.edit);
     },
+    saveGrade(course_id, period_id) {
+      var course = this.grades[course_id];
+      if (course) {
+        this.$set(course[period_id], "edit", false);
+        var period = course[period_id];
+        var data = {
+          course_id,
+          period_id,
+          user_id: this.userID,
+          grade: period.value,
+        };
+
+        var h_method = "create";
+        var h_route = "grades";
+        if (period.id) {
+          h_method = "update";
+          h_route = "grades/" + period.id;
+        }
+        this.$store
+          .dispatch(h_method, {
+            route: h_route,
+            data: data,
+          })
+          .then(() => {
+            console.log("creado");
+            this.$set(course[period_id], "status", "saved");
+            this.$store.dispatch("load", "grades");
+          });
+      }
+    },
     updategradesForm(grades) {
       var oldGrades = this.grades;
       /*this.grades.reduce((grs, o) => {
@@ -216,7 +246,7 @@ export default {
       this.grades = newGrades;
     },
     finalGrade(course_id) {
-      var grades = this.grades[course_id] // .find((g) => g.course_id == course_id);
+      var grades = this.grades[course_id]; // .find((g) => g.course_id == course_id);
       if (!grades) return "N/A";
       var list = Object.values(grades).filter(
         (g) => g.status && g.status != "none"
@@ -226,8 +256,9 @@ export default {
       console.log(list, course_id);
 
       return (
-        list.reduce((total, period) => total + parseInt(period.value), 0) / list.length
-      );
+        list.reduce((total, period) => total + parseInt(period.value), 0) /
+        list.length
+      ).toFixed(1);
     },
     updateFormData(val) {
       this.formData = Object.assign(this.formData, val);
@@ -281,6 +312,9 @@ export default {
 };
 </script>
 <style scoped>
+tr.border th {
+  border-bottom: thin solid rgba(0, 0, 0, 0.2);
+}
 .gradeForm {
   position: relative;
 }

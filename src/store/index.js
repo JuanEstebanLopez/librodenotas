@@ -272,7 +272,7 @@ export default new Vuex.Store({
   },
   mutations: {
     LOAD: (state, payload) => {
-      state[payload.key] = payload.data;
+      state[payload.key] = Object.assign({}, state[payload.key] || {}, payload.data); // payload.data; //
       return state[payload.key];
     },
   },
